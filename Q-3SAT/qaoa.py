@@ -99,7 +99,7 @@ def get_params(H, n_qubits, p):
     # the bounds required by L-BFGS-B
     bounds = [(low, high) for low, high in zip(params_min, params_max)]
 # use method L-BFGS-B because the problem is smooth and bounded
-    result = scipy.optimize.minimize(fun, params_0, method="L-BFGS-B",bounds=bounds )
+    result = scipy.optimize.minimize(fun, params_0, method="L-BFGS-B",bounds=bounds)
     return [result.x[i] for i in range(2*p)]
 
 
@@ -122,11 +122,3 @@ def qaoa(H, n_qubits, p):
     """
     params=get_params(H,n_qubits,p)
     return cost_function(H, n_qubits, p, params)
-
-
-def projection_ground_space(cnf, n_qubits, p):
-    result=0
-    qaoa_state=qaoa(cnf_to_hamiltonian(cnf,n_qubits),n_qubits, p)[1]
-    for i in np.where(ground_state(cnf, n_qubits) != 0)[0]:
-        result+=np.abs(qaoa_state[i])**2
-    return result

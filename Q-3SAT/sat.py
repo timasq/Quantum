@@ -163,11 +163,17 @@ def thermal_overlap(cnf,n_variables, beta):
         number: overlap between thermal state of 3-SAT Hamiltonian
     """
 #     generate superposition of ground states
-    g_state=ground_state(cnf,n_variables)
+    # g_state=ground_state(cnf,n_variables)
 #     generate initial state
 #     i_state=initial_state
 #     generate cooling operator
-    H=cnf_to_hamiltonian(cnf,n_variables).toarray()[0,:]
-    U=np.exp(-beta*H)
+    H=cnf_to_hamiltonian(cnf,n_variables).diagonal()
+    min_energy=np.where(H == H.min())[0]
+    min_H=H.min()
+    trace=0
+    for i in range(len(H)):
+        trace+=np.exp(-beta*H[i])
     
-    return np.matmul(g_state, U.T/np.sum(U))  
+    overlap=len(min_energy)*np.exp(-beta*min_H)/trace
+    
+    return overlap
