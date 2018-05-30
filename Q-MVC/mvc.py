@@ -79,7 +79,6 @@ def thermal_overlap(graph,beta):
     # mvc="{0:b}".format(min_energy[0])
     # # print(mvc)
     n0=bin(min_energy[0]).count("1")
-    # n0=n_variables-n1
     # print(n0)
     trace=0
     for i in range(len(H)):
