@@ -87,17 +87,3 @@ def thermal_overlap(graph,beta):
     overlap=len(min_energy)*np.exp(-beta*min_H)/trace
 
     return n0, overlap
-
-
-
-# def thermal_overlap(graph, beta):
-# #     generate superposition of ground states
-#     g_state=ground_state(graph)[0]
-# #     generate initial state
-# #     i_state=initial_state
-# #     generate cooling operator
-#     H=FromGraphToHamiltonian(graph)
-#     U=np.exp(-beta*H)
-#     trace=U.sum()
-    
-#     return ((g_state.dot(U))/trace)[0]
