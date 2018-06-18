@@ -19,6 +19,16 @@ def plus_state(n_qubits):
     """
     return np.array([1]*(2**n_qubits))/np.sqrt(2**n_qubits)
 
+def X_operator(n, N):
+    X=np.array([[0,1],[1,0]])
+    I=np.array([[1,0],[0,1]])
+    for i in range(n):
+        X=sparse.kron(I,X)
+    for i in range(n+1, N):
+        X=sparse.kron(X,I)
+    return X
+
+
 def B_operator(n_qubits):
     """Returns driver Hamiltonian
     Args:
@@ -29,10 +39,9 @@ def B_operator(n_qubits):
     ----------
         scipy sparse array: \sum X_i 
     """
-    X=np.array([[0,1],[1,0]])
-    B=np.array([[0,1],[1,0]])
+    B=X_operator(0,n_qubits)
     for i in range(1,n_qubits):
-        B=sparse.kron(X,B)
+        B+=X_operator(i,n_qubits)
     return B
 
 def qaoa_step(state, H, n_qubits, params):
@@ -50,9 +59,9 @@ def qaoa_step(state, H, n_qubits, params):
     ----------
         scipy sparse array: state after application of $e^{-1j*params[1]*B}e^{1j*params[0]*H}|state>$
     """
-
+    B=B_operator(n_qubits)
     state=lasp.expm_multiply(1j*params[0]*H, state)
-    return lasp.expm_multiply(-1j*params[1]*B_operator(n_qubits),state)  
+    return lasp.expm_multiply(-1j*params[1]*B,state)  
 
 def cost_function(H, n_qubits, p, params):
     """Returns cost function of QAOA and QAOA state
@@ -99,9 +108,8 @@ def get_params(H, n_qubits, p):
     # the bounds required by L-BFGS-B
     bounds = [(low, high) for low, high in zip(params_min, params_max)]
 # use method L-BFGS-B because the problem is smooth and bounded
-    result = scipy.optimize.minimize(fun, params_0, method="L-BFGS-B",bounds=bounds)
+    result = scipy.optimize.minimize(fun, params_0, method="TNC",bounds=bounds)
     return [result.x[i] for i in range(2*p)]
-
 
 def qaoa(H, n_qubits, p):
     """Returns the value of cost function of QAOA for p steps
